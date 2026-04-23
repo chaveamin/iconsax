@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuil": "node scripts/generate-icons-metadata.mjs",
+    "prebuild": "node scripts/generate-icons-metadata.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
