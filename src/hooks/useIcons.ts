@@ -6,7 +6,7 @@ export function useIcons() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/icons")
+    fetch("/icons-metadata.json")
       .then((res) => res.json())
       .then((data) => {
         setIcons(data);
