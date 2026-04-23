@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-jet: var(--font-jet);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  font-variation-settings: "dots" 1;
+}
+
+.grid-pattern {
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      var(--color-zinc-800) 0px,
+      var(--color-zinc-800) 1px,
+      transparent 1px,
+      transparent 15px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      var(--color-zinc-800) 0px,
+      var(--color-zinc-800) 1px,
+      transparent 1px,
+      transparent 15px
+    );
+}
+
+.tooltip {
+  @apply invisible absolute;
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible z-50;
+}
