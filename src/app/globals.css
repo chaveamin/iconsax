@@ -47,3 +47,6 @@ body {
 .has-tooltip:hover .tooltip {
   @apply visible z-50;
 }
+.list-box-options {
+  scrollbar-width: none;
+}

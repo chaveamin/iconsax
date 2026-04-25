@@ -21,8 +21,8 @@ export function IconCard({
     <div
       data-icon-card
       data-path={icon.path}
-      className={`group relative bg-zinc-900/50 backdrop-blur-sm border rounded-2xl p-5 flex flex-col items-center cursor-pointer transition-all duration-200
-        ${isSelected ? "border-zinc-400 ring-2 ring-zinc-500/50 bg-zinc-800/80" : "border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/40"}`}
+      className={`group relative bg-zinc-900/50 backdrop-blur-sm border rounded-2xl p-5 flex flex-col items-center cursor-pointer transition duration-200
+        ${isSelected ? "border-teal-400 ring-2 ring-teal-400/10 bg-zinc-800/80" : "border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/40"}`}
       onClick={onClick}
     >
       <div
@@ -45,7 +45,7 @@ export function IconCard({
       >
         {({ checked }) => (
           <div
-            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${checked ? "bg-zinc-100 border-zinc-100" : "border-zinc-600 group-hover:border-zinc-400"}`}
+            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${checked ? "bg-teal-500 border-teal-500" : "border-zinc-600 group-hover:border-zinc-400"}`}
           >
             {checked && (
               <svg

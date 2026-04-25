@@ -147,7 +147,7 @@ export default function Home() {
   }));
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-zinc-700">
+    <main className="min-h-screen bg-zinc-900 text-zinc-100 selection:bg-zinc-700">
       <div className="container mx-auto px-4 py-10">
         <Header />
         <FilterBar
@@ -195,7 +195,7 @@ export default function Home() {
               <div className="flex justify-center mt-12">
                 <button
                   onClick={loadMore}
-                  className="px-8 py-3 bg-zinc-800 text-zinc-200 rounded-2xl text-sm font-medium hover:bg-zinc-700 transition-all duration-200 border border-zinc-700 cursor-pointer"
+                  className="px-8 py-3 bg-zinc-800 text-zinc-200 rounded-2xl text-sm font-medium hover:bg-zinc-700 transition-all duration-200 cursor-pointer"
                 >
                   Load More ({filteredIcons.length - displayCount} remaining)
                 </button>
