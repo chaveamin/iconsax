@@ -1,5 +1,6 @@
 import { IconMeta } from "../types";
 import { getDisplayName } from "../lib/utils";
+import { useState, useEffect } from "react";
 
 interface PreviewModalProps {
   icon: IconMeta | null;
@@ -9,6 +10,19 @@ interface PreviewModalProps {
   onCopy: () => void;
 }
 
+const MODES = ["straight", "rounded"] as const;
+const STYLES = [
+  "bold",
+  "broken",
+  "bulk",
+  "linear",
+  "outline",
+  "twotone",
+] as const;
+
+type Mode = (typeof MODES)[number];
+type Style = (typeof STYLES)[number];
+
 export function PreviewModal({
   icon,
   isOpen,
@@ -16,22 +30,72 @@ export function PreviewModal({
   onClose,
   onCopy,
 }: PreviewModalProps) {
+  const [selectedMode, setSelectedMode] = useState<Mode>("straight");
+  const [selectedStyle, setSelectedStyle] = useState<Style>("bold");
+  const [activeSvg, setActiveSvg] = useState(svgContent);
+  const [loadingVariant, setLoadingVariant] = useState(false);
+
+  // Sync initial mode/style from the icon that was clicked
+  useEffect(() => {
+    if (icon) {
+      setSelectedMode(icon.mode as Mode);
+      setSelectedStyle(icon.style as Style);
+    }
+  }, [icon]);
+
+  // Fetch SVG whenever mode/style/icon changes
+  useEffect(() => {
+    if (!icon) return;
+    const path = `/icons/${selectedMode}/${icon.category}/${selectedStyle}/${icon.name}.svg`;
+    setLoadingVariant(true);
+    fetch(path)
+      .then((res) => (res.ok ? res.text() : Promise.reject()))
+      .then((text) => {
+        setActiveSvg(text);
+      })
+      .catch(() => {
+        setActiveSvg("");
+      })
+      .finally(() => setLoadingVariant(false));
+  }, [icon, selectedMode, selectedStyle]);
+
+  // Keep activeSvg in sync when parent loads initial svgContent
+  useEffect(() => {
+    if (svgContent) setActiveSvg(svgContent);
+  }, [svgContent]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(activeSvg);
+    onCopy();
+  };
+
+  const activeIconPath = icon
+    ? `/icons/${selectedMode}/${icon.category}/${selectedStyle}/${icon.name}.svg`
+    : "";
+
   if (!icon) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-200 ${isOpen ? "bg-black/70 backdrop-blur-sm" : "bg-transparent pointer-events-none"}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-200 ${
+        isOpen
+          ? "bg-black/70 backdrop-blur-sm"
+          : "bg-transparent pointer-events-none"
+      }`}
       onClick={onClose}
     >
       <div
-        className={`bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl transition-all duration-200 ${isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
+        className={`bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-200 ${
+          isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-zinc-800">
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-zinc-800 sticky top-0 bg-zinc-900 z-10 rounded-t-3xl">
           <h3 className="text-lg font-semibold text-zinc-100">
             {getDisplayName(icon.name)}
             <span className="ml-2 text-xs font-normal text-zinc-500">
-              {icon.style} &bull; {icon.category}
+              {selectedStyle} &bull; {icon.category}
             </span>
           </h3>
           <button
@@ -54,21 +118,101 @@ export function PreviewModal({
           </button>
         </div>
 
-        <div className="grid-pattern p-2 lg:p-4 flex justify-center bg-zinc-950/50 border-b border-zinc-800">
-          <img src={icon.path} alt={icon.name} className="lg:w-38 w-30" />
+        {/* Large preview */}
+        <div className="grid-pattern p-6 flex justify-center bg-zinc-950/50 border-b border-zinc-800">
+          {loadingVariant ? (
+            <div className="lg:w-38 w-30 aspect-square flex items-center justify-center">
+              <div className="size-6 rounded-full border-2 border-zinc-600 border-t-teal-400 animate-spin" />
+            </div>
+          ) : activeSvg ? (
+            <img
+              src={activeIconPath}
+              alt={icon.name}
+              className="lg:w-38 w-30"
+            />
+          ) : (
+            <div className="lg:w-38 w-30 aspect-square flex items-center justify-center text-zinc-600 text-xs">
+              Not available
+            </div>
+          )}
         </div>
 
-        <div className="p-5">
-          <p className="text-xs font-medium text-zinc-400 mb-2">SVG Code</p>
-          <pre className="bg-zinc-950 rounded-xl p-4 text-xs text-blue-300 overflow-auto max-h-48 font-jet border border-zinc-800">
-            {svgContent}
-          </pre>
+        <div className="p-5 space-y-5">
+          {/* Mode picker */}
+          <div>
+            <p className="text-xs font-medium text-zinc-400 mb-2.5">Mode</p>
+            <div className="flex gap-2">
+              {MODES.map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setSelectedMode(mode)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 capitalize ${
+                    selectedMode === mode
+                      ? "bg-teal-500/20 text-teal-300 ring-1 ring-teal-500/50"
+                      : "bg-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700"
+                  }`}
+                >
+                  {mode}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Style picker with mini previews */}
+          <div>
+            <p className="text-xs font-medium text-zinc-400 mb-2.5">Style</p>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {STYLES.map((style) => {
+                const variantPath = `icons/${selectedMode}/${icon.category}/${style}/${icon.name}.svg`;
+                return (
+                  <button
+                    key={style}
+                    onClick={() => setSelectedStyle(style)}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-150 ${
+                      selectedStyle === style
+                        ? "border-teal-400 bg-teal-500/10 ring-1 ring-teal-500/30"
+                        : "border-zinc-800 bg-zinc-800/40 hover:border-zinc-600 hover:bg-zinc-800/80"
+                    }`}
+                  >
+                    <img
+                      src={variantPath}
+                      alt={`${style} style`}
+                      className="w-8 h-8 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.opacity = "0.2";
+                      }}
+                    />
+                    <span
+                      className={`text-[10px] font-medium capitalize ${
+                        selectedStyle === style
+                          ? "text-teal-300"
+                          : "text-zinc-500"
+                      }`}
+                    >
+                      {style}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* SVG Code */}
+          <div>
+            <p className="text-xs font-medium text-zinc-400 mb-2">SVG Code</p>
+            <pre className="bg-zinc-950 rounded-xl p-4 text-xs text-blue-300 overflow-auto max-h-40 font-jet border border-zinc-800">
+              {activeSvg || "// Not available for this combination"}
+            </pre>
+          </div>
         </div>
 
-        <div className="flex gap-3 justify-end p-5 border-t border-zinc-800">
+        {/* Actions */}
+        <div className="flex gap-3 justify-end p-5 border-t border-zinc-800 sticky bottom-0 bg-zinc-900 rounded-b-3xl">
           <button
-            onClick={onCopy}
-            className="cursor-pointer px-3 py-2.5 bg-zinc-800 text-zinc-200 rounded-xl text-sm font-medium hover:bg-zinc-700 transition-all duration-200 flex items-center gap-2"
+            onClick={handleCopy}
+            disabled={!activeSvg}
+            className="cursor-pointer px-3 py-2.5 bg-zinc-800 text-zinc-200 rounded-xl text-sm font-medium hover:bg-zinc-700 transition-all duration-200 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Copy SVG code"
           >
             <svg
               className="size-6"
@@ -114,9 +258,19 @@ export function PreviewModal({
             </svg>
           </button>
           <a
-            href={icon.path}
-            download
-            className="px-3 py-2.5 bg-zinc-100 text-zinc-900 rounded-xl text-sm font-medium hover:bg-white transition-all duration-200 flex items-center gap-2"
+            href={activeSvg ? activeIconPath : undefined}
+            download={
+              activeSvg
+                ? `${getDisplayName(icon.name)}-${selectedMode}-${selectedStyle}.svg`
+                : undefined
+            }
+            aria-disabled={!activeSvg}
+            className={`px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+              activeSvg
+                ? "bg-zinc-100 text-zinc-900 hover:bg-white"
+                : "bg-zinc-700 text-zinc-500 pointer-events-none opacity-40"
+            }`}
+            title="Download SVG"
           >
             <svg
               className="size-6"
