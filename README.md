@@ -12,6 +12,5 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 npm run build
 ```
 
-[!NOTE]
-
+> [!NOTE]
 > App is optimized for static export
