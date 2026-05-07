@@ -115,7 +115,7 @@ export function PreviewModal({
           <h3 className="text-lg font-semibold text-zinc-100">
             {getDisplayName(icon.name)}
             <span className="ml-2 text-xs font-normal text-zinc-500">
-              {selectedStyle} &bull; {icon.category}
+              {selectedMode} &bull; {icon.category} &bull; {selectedStyle}
             </span>
           </h3>
           <button
@@ -146,7 +146,7 @@ export function PreviewModal({
             </div>
           ) : activeSvg ? (
             <img
-              src={activeIconPath}
+              src={activeIconPath ? activeIconPath : undefined}
               alt={icon.name}
               className="lg:w-38 w-30"
             />
@@ -188,14 +188,14 @@ export function PreviewModal({
                   <button
                     key={style}
                     onClick={() => setSelectedStyle(style)}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-150 cursor-pointer ${
+                    className={`flex flex-col items-center gap-2 p-2 rounded-xl border transition-all duration-150 cursor-pointer ${
                       selectedStyle === style
                         ? "border-teal-400 bg-teal-500/10 ring-1 ring-teal-500/30"
-                        : "border-zinc-800 bg-zinc-800/40 hover:border-zinc-600 hover:bg-zinc-800/80"
+                        : "border-zinc-100/15 bg-zinc-800/40 hover:border-zinc-600 hover:bg-zinc-800/80"
                     }`}
                   >
                     <img
-                      src={variantPath}
+                      src={variantPath ? variantPath : undefined}
                       alt={`${style} style`}
                       className="w-8 h-8 object-contain"
                       onError={(e) => {
@@ -220,7 +220,7 @@ export function PreviewModal({
           {/* SVG Code */}
           <div>
             <p className="text-xs font-medium text-zinc-400 mb-2">SVG Code</p>
-            <pre className="bg-zinc-950 rounded-xl p-4 text-xs text-blue-300 overflow-auto max-h-40 font-jet border border-zinc-800">
+            <pre className="icon-svg-code bg-zinc-950 rounded-xl p-4 text-xs text-blue-300 overflow-auto max-h-40 font-jet border border-zinc-800">
               {activeSvg || "// Not available for this combination"}
             </pre>
           </div>

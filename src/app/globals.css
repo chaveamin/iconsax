@@ -11,13 +11,6 @@
   --font-jet: var(--font-jet);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   font-variation-settings: "dots" 1;
 }
@@ -48,5 +41,8 @@ body {
   @apply visible z-50;
 }
 .list-box-options {
+  scrollbar-width: none;
+}
+.icon-svg-code {
   scrollbar-width: none;
 }
