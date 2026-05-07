@@ -43,6 +43,7 @@ body {
 .list-box-options {
   scrollbar-width: none;
 }
-.icon-svg-code {
+.icon-svg-code,
+.prev-modal {
   scrollbar-width: none;
 }
