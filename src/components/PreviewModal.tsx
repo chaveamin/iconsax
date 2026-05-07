@@ -8,6 +8,7 @@ interface PreviewModalProps {
   svgContent: string;
   onClose: () => void;
   onCopy: () => void;
+  allIcons: IconMeta[];
 }
 
 const MODES = ["straight", "rounded"] as const;
@@ -29,11 +30,24 @@ export function PreviewModal({
   svgContent,
   onClose,
   onCopy,
+  allIcons,
 }: PreviewModalProps) {
   const [selectedMode, setSelectedMode] = useState<Mode>("straight");
   const [selectedStyle, setSelectedStyle] = useState<Style>("bold");
   const [activeSvg, setActiveSvg] = useState(svgContent);
   const [loadingVariant, setLoadingVariant] = useState(false);
+  const getVariantPath = (mode: string, style: string): string => {
+    if (!icon) return "";
+    const baseName = icon.name.split("_")[0];
+    const match = allIcons.find(
+      (i) =>
+        i.name.split("_")[0] === baseName &&
+        i.category === icon.category &&
+        i.mode === mode &&
+        i.style === style,
+    );
+    return match ? match.path : "";
+  };
 
   // Sync initial mode/style from the icon that was clicked
   useEffect(() => {
@@ -46,18 +60,26 @@ export function PreviewModal({
   // Fetch SVG whenever mode/style/icon changes
   useEffect(() => {
     if (!icon) return;
-    const path = `/icons/${selectedMode}/${icon.category}/${selectedStyle}/${icon.name}.svg`;
+    const baseName = icon.name.split("_")[0];
+    const match = allIcons.find(
+      (i) =>
+        i.name.split("_")[0] === baseName &&
+        i.category === icon.category &&
+        i.mode === selectedMode &&
+        i.style === selectedStyle,
+    );
+    const path = match?.path;
+    if (!path) {
+      setActiveSvg("");
+      return;
+    }
     setLoadingVariant(true);
     fetch(path)
       .then((res) => (res.ok ? res.text() : Promise.reject()))
-      .then((text) => {
-        setActiveSvg(text);
-      })
-      .catch(() => {
-        setActiveSvg("");
-      })
+      .then(setActiveSvg)
+      .catch(() => setActiveSvg(""))
       .finally(() => setLoadingVariant(false));
-  }, [icon, selectedMode, selectedStyle]);
+  }, [icon, selectedMode, selectedStyle, allIcons]);
 
   // Keep activeSvg in sync when parent loads initial svgContent
   useEffect(() => {
@@ -69,9 +91,7 @@ export function PreviewModal({
     onCopy();
   };
 
-  const activeIconPath = icon
-    ? `/icons/${selectedMode}/${icon.category}/${selectedStyle}/${icon.name}.svg`
-    : "";
+  const activeIconPath = getVariantPath(selectedMode, selectedStyle);
 
   if (!icon) return null;
 
@@ -100,7 +120,7 @@ export function PreviewModal({
           </h3>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
           >
             <svg
               className="size-5"
@@ -163,12 +183,12 @@ export function PreviewModal({
             <p className="text-xs font-medium text-zinc-400 mb-2.5">Style</p>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {STYLES.map((style) => {
-                const variantPath = `icons/${selectedMode}/${icon.category}/${style}/${icon.name}.svg`;
+                const variantPath = getVariantPath(selectedMode, style);
                 return (
                   <button
                     key={style}
                     onClick={() => setSelectedStyle(style)}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-150 ${
+                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-150 cursor-pointer ${
                       selectedStyle === style
                         ? "border-teal-400 bg-teal-500/10 ring-1 ring-teal-500/30"
                         : "border-zinc-800 bg-zinc-800/40 hover:border-zinc-600 hover:bg-zinc-800/80"
@@ -182,7 +202,7 @@ export function PreviewModal({
                         (e.target as HTMLImageElement).style.opacity = "0.2";
                       }}
                     />
-                    <span
+                    {/* <span
                       className={`text-[10px] font-medium capitalize ${
                         selectedStyle === style
                           ? "text-teal-300"
@@ -190,7 +210,7 @@ export function PreviewModal({
                       }`}
                     >
                       {style}
-                    </span>
+                    </span> */}
                   </button>
                 );
               })}

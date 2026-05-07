@@ -211,6 +211,7 @@ export default function Home() {
         svgContent={svgContent}
         onClose={closePreview}
         onCopy={handleCopyCode}
+        allIcons={icons}
       />
 
       <Toast visible={toastVisible} message={toastMessage} />
