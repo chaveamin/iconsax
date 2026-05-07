@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
+import { svgbgIcon } from "../components/ui/Icons";
 
 const iranYekan = localFont({
   src: "../../public/IRANYekanXVF.woff2",

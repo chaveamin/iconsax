@@ -1,6 +1,16 @@
 import { Checkbox } from "@headlessui/react";
 import { IconMeta } from "../types";
 import { getDisplayName } from "../lib/utils";
+import { iconCheckedIcon } from "./ui/Icons";
+
+function Icons({
+  icon: Icon,
+  ...props
+}: React.ComponentPropsWithoutRef<"span"> & {
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return <Icon />;
+}
 
 interface IconCardProps {
   icon: IconMeta;
@@ -47,19 +57,7 @@ export function IconCard({
           <div
             className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${checked ? "bg-teal-500 border-teal-500" : "border-zinc-600 group-hover:border-zinc-400"}`}
           >
-            {checked && (
-              <svg
-                className="size-3.5 text-zinc-900"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            )}
+            {checked && <Icons icon={iconCheckedIcon} />}
           </div>
         )}
       </Checkbox>

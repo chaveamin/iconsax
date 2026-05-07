@@ -1,5 +1,15 @@
 import { CustomSelect } from "./ui/CustomSelect";
 import { SelectOption } from "../types";
+import { crossIcon, searchIcon } from "./ui/Icons";
+
+function Icons({
+  icon: Icon,
+  ...props
+}: React.ComponentPropsWithoutRef<"span"> & {
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return <Icon />;
+}
 
 interface FilterBarProps {
   modeOptions: SelectOption[];
@@ -56,20 +66,7 @@ export function FilterBar({
             onClick={onClearFilters}
             className="px-4 py-2.5 bg-zinc-800 text-zinc-300 rounded-xl text-sm font-medium hover:bg-zinc-700 transition-all duration-200 flex items-center gap-2 border border-zinc-700 cursor-pointer"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="size-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18 18 6M6 6l12 12"
-              />
-            </svg>
+            <Icons icon={crossIcon} />
             Clear Filters
           </button>
         )}
@@ -83,19 +80,7 @@ export function FilterBar({
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
         />
-        <svg
-          className="absolute left-3 top-3 size-4 text-zinc-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
+        <Icons icon={searchIcon} />
       </div>
     </>
   );
