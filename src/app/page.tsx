@@ -14,6 +14,7 @@ import { IconGrid } from "@/src/components/IconGrid";
 import { PreviewModal } from "@/src/components/PreviewModal";
 import { Toast } from "@/src/components/Toast";
 import { SelectOption } from "@/src/types";
+import { getSearchTerms } from "../lib/searchIndex";
 
 const STYLES = [
   "all",
@@ -58,7 +59,12 @@ export default function Home() {
         return false;
       if (selectedStyle !== "all" && icon.style !== selectedStyle) return false;
       if (searchTerm.trim()) {
-        return icon.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const term = searchTerm.toLowerCase();
+        const terms = getSearchTerms(icon.name);
+        return (
+          terms.some((t) => t.includes(term)) ||
+          icon.name.toLowerCase().includes(term)
+        );
       }
       return true;
     });
