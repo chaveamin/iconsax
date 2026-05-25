@@ -1,15 +1,6 @@
 import { CustomSelect } from "./ui/CustomSelect";
 import { SelectOption } from "../types";
-import { crossIcon, searchIcon } from "./ui/Icons";
-
-function Icons({
-  icon: Icon,
-  ...props
-}: React.ComponentPropsWithoutRef<"span"> & {
-  icon: React.ComponentType<{ className?: string }>;
-}) {
-  return <Icon />;
-}
+import { Icon, crossIcon, searchIcon } from "./ui/Icons";
 
 interface FilterBarProps {
   modeOptions: SelectOption[];
@@ -66,7 +57,7 @@ export function FilterBar({
             onClick={onClearFilters}
             className="px-4 py-2.5 bg-zinc-800 text-zinc-300 rounded-xl text-sm font-medium hover:bg-zinc-700 transition-all duration-200 flex items-center gap-2 border border-zinc-700 cursor-pointer"
           >
-            <Icons icon={crossIcon} />
+            <Icon icon={crossIcon} />
             Clear Filters
           </button>
         )}
@@ -80,7 +71,7 @@ export function FilterBar({
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
         />
-        <Icons icon={searchIcon} />
+        <Icon icon={searchIcon} />
       </div>
     </>
   );

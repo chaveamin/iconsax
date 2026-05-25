@@ -115,3 +115,16 @@ export function selectCheckedIcon(
     </svg>
   );
 }
+
+export function Icon({
+  icon: IconComponent,
+  ...props
+}: React.ComponentPropsWithoutRef<"span"> & {
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <span {...props}>
+      <IconComponent />
+    </span>
+  );
+}

@@ -1,13 +1,4 @@
-import { toastIcon } from "./ui/Icons";
-
-function Icons({
-  icon: Icon,
-  ...props
-}: React.ComponentPropsWithoutRef<"span"> & {
-  icon: React.ComponentType<{ className?: string }>;
-}) {
-  return <Icon />;
-}
+import { Icon, toastIcon } from "./ui/Icons";
 
 interface ToastProps {
   visible: boolean;
@@ -21,7 +12,7 @@ export function Toast({ visible, message }: ToastProps) {
         ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
     >
       <div className="bg-zinc-800 border border-zinc-700 rounded-xl px-5 py-2.5 shadow-xl flex items-center gap-2">
-        <Icons icon={toastIcon} />
+        <Icon icon={toastIcon} />
         <span className="text-sm text-zinc-200">{message}</span>
       </div>
     </div>
