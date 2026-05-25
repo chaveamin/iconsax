@@ -101,7 +101,7 @@ export function PreviewModal({
       case "svelte":
         return generateSvelte(activeSvg);
       case "html":
-        return generateHtml(activeIconPath, displayName);
+        return generateHtml(activeSvg, displayName);
       case "webcomponent":
         return generateWebComponent(activeSvg, displayName);
     }

@@ -65,8 +65,9 @@ export function generateSvelte(svg: string): string {
 </svg>`;
 }
 
-export function generateHtml(iconPath: string, displayName: string): string {
-  return `<img src="${iconPath}" alt="${displayName}" width="24" height="24" />`;
+export function generateHtml(svg: string, displayName: string): string {
+  const base64 = btoa(unescape(encodeURIComponent(svg)));
+  return `<img src="data:image/svg+xml;base64,${base64}" alt="${displayName}" width="24" height="24" />`;
 }
 
 export function generateWebComponent(svg: string, displayName: string): string {
