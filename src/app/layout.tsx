@@ -23,7 +23,6 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="fa"
       className={`${iranYekan.className} ${jetBrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
