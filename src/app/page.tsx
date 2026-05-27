@@ -123,7 +123,6 @@ export default function Home() {
   };
 
   const handleCopyCode = () => {
-    navigator.clipboard.writeText(svgContent);
     showToast("Copied to clipboard");
   };
 
