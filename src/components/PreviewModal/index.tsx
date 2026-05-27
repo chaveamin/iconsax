@@ -152,7 +152,7 @@ export function PreviewModal({
 
         <div className="w-[90%] flex flex-col items-start gap-y-5 pl-5 *:w-full">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 z-10 rounded-t-3xl">
+          <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 z-10 rounded-t-3xl pb-3">
             <h3 className="text-lg font-semibold text-zinc-100">
               {displayName}
               <span className="ml-2 text-xs font-normal text-zinc-500">

@@ -3,6 +3,7 @@
   "version": "1.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/generate-icons-metadata.mjs",
     "dev": "next dev",
     "prebuild": "node scripts/generate-icons-metadata.mjs",
     "build": "next build",

@@ -155,7 +155,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-zinc-900 text-zinc-100 selection:bg-zinc-700">
       <div className="container mx-auto px-4 py-10">
-        <Header />
+        <Header count={icons.length} />
         <FilterBar
           modeOptions={MODE_OPTIONS}
           categoryOptions={categoryOptions}
