@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
-import { svgbgIcon } from "../components/ui/Icons";
 
-const iranYekan = localFont({
-  src: "../../public/IRANYekanXVF.woff2",
-});
 const jetBrains = localFont({
   src: "../../public/JetBrains.ttf",
   variable: "--font-jet",
@@ -22,9 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      className={`${iranYekan.className} ${jetBrains.variable} h-full antialiased`}
-    >
+    <html className={`${jetBrains.variable} h-full antialiased font-jet`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

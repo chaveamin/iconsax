@@ -15,7 +15,10 @@ export function Header({ count }: { count: number }) {
         </a>{" "}
         premium icons
         {count > 0 && (
-          <span className="ml-2 text-zinc-500">· {count.toLocaleString()}</span>
+          <span className="ml-2">
+            <span className="text-zinc-600">&bull;</span>{" "}
+            {count.toLocaleString()}
+          </span>
         )}
       </p>
     </header>
