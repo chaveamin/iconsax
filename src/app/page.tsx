@@ -217,6 +217,7 @@ export default function Home() {
         onClose={closePreview}
         onCopy={handleCopyCode}
         allIcons={icons}
+        navIcons={filteredIcons}
       />
 
       <Toast visible={toastVisible} message={toastMessage} />

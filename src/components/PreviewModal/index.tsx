@@ -8,7 +8,7 @@ import {
   generateHtml,
   generateWebComponent,
 } from "../../lib/iconCodeGenerators";
-import { MODES, STYLES, FRAMEWORKS, Mode, Style, Framework } from "./types";
+import { FRAMEWORKS, Mode, Style, Framework } from "./types";
 import { VariantSidebar } from "./VariantSlider";
 import { FrameworkTabs } from "./FrameworkTab";
 import { IconPreview } from "./IconPreview";
@@ -22,6 +22,7 @@ interface PreviewModalProps {
   onClose: () => void;
   onCopy: () => void;
   allIcons: IconMeta[];
+  navIcons: IconMeta[];
 }
 
 function getVariantPath(
@@ -41,6 +42,83 @@ function getVariantPath(
   return match ? match.path : "";
 }
 
+interface NavButtonProps {
+  direction: "prev" | "next";
+  icon: IconMeta | null;
+  allIcons: IconMeta[];
+  disabled: boolean;
+  isOpen: boolean;
+  onClick: () => void;
+}
+
+function NavButton({
+  direction,
+  icon,
+  allIcons,
+  disabled,
+  isOpen,
+  onClick,
+}: NavButtonProps) {
+  // Show the icon in its first available variant
+  const previewPath = useMemo(() => {
+    if (!icon) return "";
+    for (const style of [
+      "bold",
+      "linear",
+      "outline",
+      "broken",
+      "bulk",
+      "twotone",
+    ]) {
+      for (const mode of ["straight", "rounded"]) {
+        const p = getVariantPath(icon, allIcons, mode, style);
+        if (p) return p;
+      }
+    }
+    return "";
+  }, [icon, allIcons]);
+
+  const displayName = icon ? getDisplayName(icon.name) : "";
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`group absolute top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 transition-all duration-200 cursor-pointer ${direction === "prev" ? "-left-80" : "-right-80"} ${disabled || !isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+    >
+      <div
+        className={`flex ${direction === "next" ? "flex-row-reverse" : ""} items-center gap-1.5 p-3 rounded-2xl border border-zinc-700 bg-zinc-900/80 backdrop-blur-sm hover:border-zinc-500 hover:bg-zinc-800 transition-all duration-150 w-fit`}
+      >
+        {/* arrow */}
+        <svg
+          className="size-5 text-zinc-500 group-hover:text-zinc-300 transition-colors"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={3}
+            d={direction === "prev" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"}
+          />
+        </svg>
+
+        {/* mini icon preview */}
+        {previewPath ? (
+          <img
+            src={previewPath}
+            alt={displayName}
+            className="size-12 object-contain opacity-60 group-hover:opacity-100 transition-opacity"
+          />
+        ) : (
+          <div className="size-7" />
+        )}
+      </div>
+    </button>
+  );
+}
+
 export function PreviewModal({
   icon,
   isOpen,
@@ -48,25 +126,58 @@ export function PreviewModal({
   onClose,
   onCopy,
   allIcons,
+  navIcons,
 }: PreviewModalProps) {
+  const [activeIcon, setActiveIcon] = useState<IconMeta | null>(icon);
   const [selectedMode, setSelectedMode] = useState<Mode>("straight");
   const [selectedStyle, setSelectedStyle] = useState<Style>("bold");
   const [activeSvg, setActiveSvg] = useState(svgContent);
   const [loadingVariant, setLoadingVariant] = useState(false);
   const [selectedFramework, setSelectedFramework] = useState<Framework>("svg");
 
-  // Sync initial mode/style from the icon that was clicked
   useEffect(() => {
     if (icon) {
+      setActiveIcon(icon);
       setSelectedMode(icon.mode as Mode);
       setSelectedStyle(icon.style as Style);
     }
   }, [icon]);
 
-  // Fetch SVG whenever mode/style/icon changes
+  const navIndex = useMemo(
+    () =>
+      activeIcon ? navIcons.findIndex((i) => i.path === activeIcon.path) : -1,
+    [activeIcon, navIcons],
+  );
+
+  const prevIcon = navIndex > 0 ? navIcons[navIndex - 1] : null;
+  const nextIcon =
+    navIndex < navIcons.length - 1 ? navIcons[navIndex + 1] : null;
+
+  const goTo = (target: IconMeta) => {
+    setActiveIcon(target);
+    setSelectedMode(target.mode as Mode);
+    setSelectedStyle(target.style as Style);
+  };
+
   useEffect(() => {
-    if (!icon) return;
-    const path = getVariantPath(icon, allIcons, selectedMode, selectedStyle);
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" && prevIcon) goTo(prevIcon);
+      if (e.key === "ArrowRight" && nextIcon) goTo(nextIcon);
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isOpen, prevIcon, nextIcon]);
+
+  useEffect(() => {
+    if (!activeIcon) return;
+    const path = getVariantPath(
+      activeIcon,
+      allIcons,
+      selectedMode,
+      selectedStyle,
+    );
     if (!path) {
       setActiveSvg("");
       return;
@@ -77,17 +188,16 @@ export function PreviewModal({
       .then(setActiveSvg)
       .catch(() => setActiveSvg(""))
       .finally(() => setLoadingVariant(false));
-  }, [icon, selectedMode, selectedStyle, allIcons]);
+  }, [activeIcon, selectedMode, selectedStyle, allIcons]);
 
-  // Keep activeSvg in sync when parent loads initial svgContent
   useEffect(() => {
     if (svgContent) setActiveSvg(svgContent);
   }, [svgContent]);
 
-  const activeIconPath = icon
-    ? getVariantPath(icon, allIcons, selectedMode, selectedStyle)
+  const activeIconPath = activeIcon
+    ? getVariantPath(activeIcon, allIcons, selectedMode, selectedStyle)
     : "";
-  const displayName = icon ? getDisplayName(icon.name) : "";
+  const displayName = activeIcon ? getDisplayName(activeIcon.name) : "";
 
   const frameworkCode = useMemo(() => {
     if (!activeSvg) return "";
@@ -105,7 +215,7 @@ export function PreviewModal({
       case "webcomponent":
         return generateWebComponent(activeSvg, displayName);
     }
-  }, [activeSvg, selectedFramework, displayName, activeIconPath]);
+  }, [activeSvg, selectedFramework, displayName]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(frameworkCode);
@@ -113,7 +223,7 @@ export function PreviewModal({
   };
 
   const handleDownload = () => {
-    if (!frameworkCode) return;
+    if (!frameworkCode || !activeIcon) return;
     const fw = FRAMEWORKS.find((f) => f.id === selectedFramework)!;
     const blob = new Blob([frameworkCode], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -124,7 +234,7 @@ export function PreviewModal({
     URL.revokeObjectURL(url);
   };
 
-  if (!icon) return null;
+  if (!activeIcon) return null;
 
   return (
     <div
@@ -135,69 +245,90 @@ export function PreviewModal({
       }`}
       onClick={onClose}
     >
-      <div
-        className={`prev-modal flex items-start justify-center bg-zinc-900 p-8 border border-zinc-700 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-200 ${
-          isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <VariantSidebar
-          icon={icon}
-          selectedMode={selectedMode}
-          selectedStyle={selectedStyle}
+      {/* Wrapper gives NavButtons their absolute positioning anchor */}
+      <div className="relative" onClick={(e) => e.stopPropagation()}>
+        <NavButton
+          direction="prev"
+          icon={prevIcon}
           allIcons={allIcons}
-          onModeChange={setSelectedMode}
-          onStyleChange={setSelectedStyle}
+          disabled={!prevIcon}
+          isOpen={isOpen}
+          onClick={() => prevIcon && goTo(prevIcon)}
         />
 
-        <div className="w-[90%] flex flex-col items-start gap-y-5 pl-5 *:w-full">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 z-10 rounded-t-3xl pb-3">
-            <h3 className="text-lg font-semibold text-zinc-100">
-              {displayName}
-              <span className="ml-2 text-xs font-normal text-zinc-500">
-                {selectedMode} &bull; {icon.category} &bull; {selectedStyle}
-              </span>
-            </h3>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
-            >
-              <svg
-                className="size-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <NavButton
+          direction="next"
+          icon={nextIcon}
+          allIcons={allIcons}
+          disabled={!nextIcon}
+          isOpen={isOpen}
+          onClick={() => nextIcon && goTo(nextIcon)}
+        />
+
+        {/* Modal box */}
+        <div
+          className={`prev-modal flex items-start justify-center bg-zinc-900 p-8 border border-zinc-700 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-200 ${
+            isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
+          }`}
+        >
+          <VariantSidebar
+            icon={activeIcon}
+            selectedMode={selectedMode}
+            selectedStyle={selectedStyle}
+            allIcons={allIcons}
+            onModeChange={setSelectedMode}
+            onStyleChange={setSelectedStyle}
+          />
+
+          <div className="w-[90%] flex flex-col items-start gap-y-5 pl-5 *:w-full">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-100">
+                  {displayName}
+                </h3>
+                <span className="text-xs text-zinc-500">
+                  {selectedMode} &bull; {activeIcon.category} &bull;{" "}
+                  {selectedStyle}
+                </span>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+                <svg
+                  className="size-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <FrameworkTabs
+              selected={selectedFramework}
+              onChange={setSelectedFramework}
+            />
+            <IconPreview
+              icon={activeIcon}
+              activeIconPath={activeIconPath}
+              activeSvg={activeSvg}
+              loading={loadingVariant}
+            />
+            <CodeBlock code={frameworkCode} loading={loadingVariant} />
+            <ModalActions
+              disabled={!frameworkCode}
+              onCopy={handleCopy}
+              onDownload={handleDownload}
+            />
           </div>
-
-          <FrameworkTabs
-            selected={selectedFramework}
-            onChange={setSelectedFramework}
-          />
-
-          <IconPreview
-            icon={icon}
-            activeIconPath={activeIconPath}
-            activeSvg={activeSvg}
-            loading={loadingVariant}
-          />
-
-          <CodeBlock code={frameworkCode} loading={loadingVariant} />
-
-          <ModalActions
-            disabled={!frameworkCode}
-            onCopy={handleCopy}
-            onDownload={handleDownload}
-          />
         </div>
       </div>
     </div>
