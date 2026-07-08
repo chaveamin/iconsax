@@ -119,7 +119,7 @@ export default function Home() {
     setDisplayCount((prev) => Math.min(prev + 50, filteredIcons.length));
   };
 
-  const handleSelectAll = () => selectAll(filteredIcons);
+  const handleSelectAll = () => selectAll(displayedIcons);
   const handleClearSelection = () => clearSelection();
 
   const handleDownload = async () => {
@@ -248,16 +248,16 @@ export default function Home() {
                 onPreview={openAnimatedPreview}
               />
             )}
-            {displayCount < filteredIcons.length && (
+            {/* {displayCount < filteredIcons.length && (
               <div className="flex justify-center mt-12">
                 <button
                   onClick={loadMore}
                   className="px-8 py-3 bg-zinc-800 text-zinc-200 rounded-2xl text-sm font-medium hover:bg-zinc-700 transition-all duration-200 cursor-pointer"
                 >
-                  Load More ({filteredIcons.length - displayCount} remaining)
+                  Load More
                 </button>
               </div>
-            )}
+            )} */}
           </>
         )}
       </div>

@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html className={`${jetBrains.variable} h-full antialiased font-jet`}>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col overflow-x-hidden">
         <ServiceWorkerRegistration />
         {children}
       </body>
