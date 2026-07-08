@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { ServiceWorkerRegistration } from "@/src/components/pwa";
@@ -8,9 +8,14 @@ const jetBrains = localFont({
   variable: "--font-jet",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#000000",
+};
+
 export const metadata: Metadata = {
   title: "iconsax",
   description: "آیکون برای طراحان و توسعه دهندگان",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

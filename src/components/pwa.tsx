@@ -45,28 +45,11 @@ export function PushNotificationManager() {
   const subscribe = async () => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
 
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(
-        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-      ),
-    });
-
-    const { subscribeUser } = await import("@/src/app/actions");
-    await subscribeUser(sub.toJSON() as any);
-    setIsSubscribed(true);
-    setPermission("granted");
+    alert("Push notifications require a server backend.");
+    return;
   };
 
   const unsubscribe = async () => {
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.getSubscription();
-    if (sub) {
-      await sub.unsubscribe();
-      const { unsubscribeUser } = await import("@/src/app/actions");
-      await unsubscribeUser();
-    }
     setIsSubscribed(false);
   };
 
