@@ -3,6 +3,7 @@
 /public/icons
 /public/icons-metadata.json
 /public/icons-animated
+.mimocode
 
 # dependencies
 /node_modules
