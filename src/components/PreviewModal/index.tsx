@@ -84,7 +84,9 @@ function NavButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`group absolute top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 transition-all duration-200 cursor-pointer ${direction === "prev" ? "-left-80" : "-right-80"} ${disabled || !isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+      className={`group absolute top-1/2 -translate-y-1/2 hidden sm:flex flex-col items-center gap-2 transition-all duration-200 cursor-pointer ${
+        direction === "prev" ? "-left-20 lg:-left-58" : "-right-20 lg:-right-58"
+      } ${disabled || !isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
     >
       <div
         className={`flex ${direction === "next" ? "flex-row-reverse" : ""} items-center gap-1.5 p-3 rounded-2xl border border-zinc-700 bg-zinc-900/80 backdrop-blur-sm hover:border-zinc-500 hover:bg-zinc-800 transition-all duration-150 w-fit`}
@@ -109,7 +111,7 @@ function NavButton({
           <img
             src={previewPath}
             alt={displayName}
-            className="size-12 object-contain opacity-60 group-hover:opacity-100 transition-opacity"
+            className="size-10 lg:size-12 object-contain opacity-60 group-hover:opacity-100 transition-opacity"
           />
         ) : (
           <div className="size-7" />
@@ -238,7 +240,7 @@ export function PreviewModal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-200 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 transition-all duration-200 ${
         isOpen
           ? "bg-black/70 backdrop-blur-sm"
           : "bg-transparent pointer-events-none"
@@ -246,7 +248,10 @@ export function PreviewModal({
       onClick={onClose}
     >
       {/* Wrapper gives NavButtons their absolute positioning anchor */}
-      <div className="relative" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="relative w-full max-w-3xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <NavButton
           direction="prev"
           icon={prevIcon}
@@ -267,10 +272,74 @@ export function PreviewModal({
 
         {/* Modal box */}
         <div
-          className={`prev-modal flex items-start justify-center bg-zinc-900 p-8 border border-zinc-700 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-200 ${
+          className={`prev-modal scrollbar-none flex flex-col sm:flex-row items-start justify-center bg-zinc-900 p-5 sm:py-8 sm:px-12 border border-zinc-700 rounded-3xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-scroll shadow-2xl transition-all duration-200 ${
             isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
           }`}
         >
+          {/* Mobile nav arrows */}
+          {/* <div className="flex sm:hidden items-center justify-between w-full mb-4">
+            <button
+              onClick={() => prevIcon && goTo(prevIcon)}
+              disabled={!prevIcon}
+              className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer disabled:opacity-30"
+            >
+              <svg
+                className="size-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <span className="text-xs text-zinc-500">
+              {navIndex + 1} / {navIcons.length}
+            </span>
+            <button
+              onClick={() => nextIcon && goTo(nextIcon)}
+              disabled={!nextIcon}
+              className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer disabled:opacity-30"
+            >
+              <svg
+                className="size-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div> */}
+
+          <button
+            onClick={onClose}
+            className="py-10 translate-y-5 sm:hidden block rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+          >
+            <svg
+              className="size-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
           <VariantSidebar
             icon={activeIcon}
             selectedMode={selectedMode}
@@ -278,13 +347,18 @@ export function PreviewModal({
             allIcons={allIcons}
             onModeChange={setSelectedMode}
             onStyleChange={setSelectedStyle}
+            prevIcon={prevIcon}
+            nextIcon={nextIcon}
+            navIndex={navIndex}
+            navCount={navIcons.length}
+            onNavigate={goTo}
           />
 
-          <div className="w-[90%] flex flex-col items-start gap-y-5 pl-5 *:w-full">
+          <div className="w-full sm:w-[90%] flex flex-col items-start gap-y-4 sm:gap-y-5 sm:pl-5 *:w-full">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
-              <div>
-                <h3 className="text-lg font-semibold text-zinc-100">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5 w-full">
+              <div className="flex sm:flex-col sm:items-start items-center justify-between w-full">
+                <h3 className="text-base sm:text-lg font-semibold text-zinc-100">
                   {displayName}
                 </h3>
                 <span className="text-xs text-zinc-500">
@@ -294,7 +368,7 @@ export function PreviewModal({
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+                className="p-1.5 hidden sm:block rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
               >
                 <svg
                   className="size-5"

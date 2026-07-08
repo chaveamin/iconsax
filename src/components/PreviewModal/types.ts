@@ -26,3 +26,5 @@ export const FRAMEWORKS: { id: Framework; label: string; ext: string }[] = [
   { id: "html", label: "HTML", ext: "html" },
   { id: "webcomponent", label: "Web Component", ext: "js" },
 ];
+
+export type IconType = "static" | "animated";

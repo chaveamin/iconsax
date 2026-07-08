@@ -3,9 +3,9 @@
   "version": "1.1.0",
   "private": true,
   "scripts": {
-    "predev": "node scripts/generate-icons-metadata.mjs",
+    "predev": "node scripts/generate-icons-metadata.mjs && node scripts/generate-animated-icons-metadata.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/generate-icons-metadata.mjs",
+    "prebuild": "node scripts/generate-icons-metadata.mjs && node scripts/generate-animated-icons-metadata.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -15,19 +15,20 @@
     "clsx": "^2.1.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
+    "lottie-react": "^2.4.1",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.3.2",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.3.2",
     "typescript": "^5"
   }
 }

@@ -1,0 +1,58 @@
+import { Checkbox } from "@headlessui/react";
+import { AnimatedIconMeta } from "../types";
+import { getDisplayName } from "../lib/utils";
+import { Icon, iconCheckedIcon } from "./ui/Icons";
+import { AnimatedIcon } from "./AnimatedIcon";
+
+interface AnimatedIconCardProps {
+  icon: AnimatedIconMeta;
+  isSelected: boolean;
+  onToggle: () => void;
+  onClick: (e: React.MouseEvent) => void;
+  onPreview: () => void;
+}
+
+export function AnimatedIconCard({
+  icon,
+  isSelected,
+  onToggle,
+  onClick,
+  onPreview,
+}: AnimatedIconCardProps) {
+  return (
+    <div
+      data-icon-card
+      data-path={icon.path}
+      className={`group relative bg-zinc-900/50 backdrop-blur-sm border rounded-2xl p-5 flex flex-col items-center cursor-pointer transition duration-200
+        ${isSelected ? "border-teal-400 ring-2 ring-teal-400/10 bg-zinc-800/80" : "border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/40"}`}
+      onClick={onClick}
+    >
+      <div
+        className="size-14 flex items-center justify-center transition-transform duration-200"
+        onClick={(e) => {
+          e.stopPropagation();
+          onPreview();
+        }}
+      >
+        <AnimatedIcon className="invert" path={icon.path} size={40} />
+      </div>
+      <span className="text-xs font-medium text-zinc-300 text-center truncate w-full">
+        {getDisplayName(icon.name)}
+      </span>
+
+      <Checkbox
+        checked={isSelected}
+        onChange={onToggle}
+        className="absolute top-3 right-3"
+      >
+        {({ checked }) => (
+          <div
+            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${checked ? "bg-teal-500 border-teal-500" : "border-zinc-600 group-hover:border-zinc-400"}`}
+          >
+            {checked && <Icon icon={iconCheckedIcon} />}
+          </div>
+        )}
+      </Checkbox>
+    </div>
+  );
+}

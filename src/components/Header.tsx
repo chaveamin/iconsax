@@ -5,7 +5,6 @@ export function Header({ count }: { count: number }) {
         iconsax
       </h1>
       <p className="mt-2 text-zinc-100">
-        All{" "}
         <a
           href="https://app.iconsax.io/"
           target="_blank"

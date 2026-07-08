@@ -2,6 +2,7 @@
 
 /public/icons
 /public/icons-metadata.json
+/public/icons-animated
 
 # dependencies
 /node_modules

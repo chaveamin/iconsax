@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { IconMeta } from "../types";
+import { IconWithMeta } from "../types";
 
-export function useSelection(displayedIcons: IconMeta[]) {
+export function useSelection(displayedIcons: IconWithMeta[]) {
   const [selectedIcons, setSelectedIcons] = useState<Set<string>>(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -44,7 +44,7 @@ export function useSelection(displayedIcons: IconMeta[]) {
     [lastClickedIndex, selectRange, toggleSelection],
   );
 
-  const selectAll = useCallback((icons: IconMeta[]) => {
+  const selectAll = useCallback((icons: IconWithMeta[]) => {
     setSelectedIcons(new Set(icons.map((i) => i.path)));
   }, []);
 

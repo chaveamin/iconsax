@@ -1,22 +1,24 @@
-interface ModalActionsProps {
+"use client";
+
+interface AnimatedModalActionsProps {
   disabled: boolean;
   onCopy: () => void;
   onDownload: () => void;
 }
 
-export function ModalActions({
+export function AnimatedModalActions({
   disabled,
   onCopy,
   onDownload,
-}: ModalActionsProps) {
+}: AnimatedModalActionsProps) {
   return (
-    <div className="flex gap-3 justify-end border-t pt-4 border-zinc-800 bg-zinc-900 rounded-b-3xl">
+    <div className="flex gap-3 justify-end border-t pt-5 border-zinc-800">
       {/* Copy */}
       <button
         onClick={onCopy}
         disabled={disabled}
         className="cursor-pointer px-3 py-2.5 bg-zinc-800 text-zinc-200 rounded-xl text-sm font-medium hover:bg-zinc-700 transition-all duration-200 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-        title="Copy code"
+        title="Copy JSON"
       >
         <svg
           className="size-6"
@@ -71,10 +73,10 @@ export function ModalActions({
             ? "bg-zinc-100 text-zinc-900 hover:bg-white"
             : "bg-zinc-700 text-zinc-500"
         }`}
-        title="Download file"
+        title="Download JSON"
       >
         <svg
-          className="size-6"
+          className="size-5"
           viewBox="0 0 24 25"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

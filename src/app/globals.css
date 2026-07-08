@@ -40,10 +40,3 @@ body {
 .has-tooltip:hover .tooltip {
   @apply visible z-50;
 }
-.list-box-options {
-  scrollbar-width: none;
-}
-.icon-svg-code,
-.prev-modal {
-  scrollbar-width: none;
-}

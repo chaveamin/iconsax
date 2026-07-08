@@ -1,6 +1,12 @@
 import { CustomSelect } from "./ui/CustomSelect";
 import { SelectOption } from "../types";
 import { Icon, crossIcon, searchIcon } from "./ui/Icons";
+import { IconType } from "../hooks/useIcons";
+
+const ICON_TYPE_OPTIONS: SelectOption[] = [
+  { value: "static", label: "Static" },
+  { value: "animated", label: "Animated" },
+];
 
 interface FilterBarProps {
   modeOptions: SelectOption[];
@@ -16,6 +22,8 @@ interface FilterBarProps {
   onSearchChange: (value: string) => void;
   hasActiveFilters: boolean;
   onClearFilters: () => void;
+  iconType: IconType;
+  onIconTypeChange: (value: IconType) => void;
 }
 
 export function FilterBar({
@@ -32,24 +40,35 @@ export function FilterBar({
   onSearchChange,
   hasActiveFilters,
   onClearFilters,
+  iconType,
+  onIconTypeChange,
 }: FilterBarProps) {
   return (
     <>
       <div className="flex flex-wrap gap-3 mb-8 justify-center lg:*:w-fit *:w-full">
         <CustomSelect
-          options={modeOptions}
-          value={selectedMode}
-          onChange={onModeChange}
+          options={ICON_TYPE_OPTIONS}
+          value={iconType}
+          onChange={(v) => onIconTypeChange(v as IconType)}
         />
+        {iconType === "static" && (
+          <>
+            <CustomSelect
+              options={modeOptions}
+              value={selectedMode}
+              onChange={onModeChange}
+            />
+            <CustomSelect
+              options={styleOptions}
+              value={selectedStyle}
+              onChange={onStyleChange}
+            />
+          </>
+        )}
         <CustomSelect
           options={categoryOptions}
           value={selectedCategory}
           onChange={onCategoryChange}
-        />
-        <CustomSelect
-          options={styleOptions}
-          value={selectedStyle}
-          onChange={onStyleChange}
         />
 
         {hasActiveFilters && (

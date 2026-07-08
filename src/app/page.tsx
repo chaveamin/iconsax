@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
-import { IconMeta } from "@/src/types";
+import { IconMeta, AnimatedIconMeta } from "@/src/types";
 import { useIcons } from "@/src/hooks/useIcons";
 import { useSelection } from "@/src/hooks/useSelection";
 import { useToast } from "@/src/hooks/useToast";
@@ -11,7 +11,9 @@ import { Header } from "@/src/components/Header";
 import { FilterBar } from "@/src/components/FilterBar";
 import { SelectionActions } from "@/src/components/SelectionActions";
 import { IconGrid } from "@/src/components/IconGrid";
+import { AnimatedIconGrid } from "@/src/components/AnimatedIconGrid";
 import { PreviewModal } from "@/src/components/PreviewModal";
+import { AnimatedPreviewModal } from "@/src/components/AnimatedPreviewModal";
 import { Toast } from "@/src/components/Toast";
 import { SelectOption } from "@/src/types";
 import { getSearchTerms } from "../lib/searchIndex";
@@ -32,7 +34,8 @@ const MODE_OPTIONS: SelectOption[] = [
 ];
 
 export default function Home() {
-  const { icons, loading, categories } = useIcons();
+  const { icons, animatedIcons, loading, categories, iconType, setIconType } =
+    useIcons();
   const {
     visible: toastVisible,
     message: toastMessage,
@@ -48,11 +51,15 @@ export default function Home() {
 
   // Preview state
   const [previewIcon, setPreviewIcon] = useState<IconMeta | null>(null);
+  const [previewAnimatedIcon, setPreviewAnimatedIcon] =
+    useState<AnimatedIconMeta | null>(null);
   const [svgContent, setSvgContent] = useState("");
+  const [jsonContent, setJsonContent] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAnimatedModalOpen, setIsAnimatedModalOpen] = useState(false);
 
   // Filter icons
-  const filteredIcons = useMemo(() => {
+  const filteredStaticIcons = useMemo(() => {
     return icons.filter((icon) => {
       if (selectedMode !== "all" && icon.mode !== selectedMode) return false;
       if (selectedCategory !== "all" && icon.category !== selectedCategory)
@@ -69,6 +76,25 @@ export default function Home() {
       return true;
     });
   }, [icons, selectedMode, selectedCategory, selectedStyle, searchTerm]);
+
+  const filteredAnimatedIcons = useMemo(() => {
+    return animatedIcons.filter((icon) => {
+      if (selectedCategory !== "all" && icon.category !== selectedCategory)
+        return false;
+      if (searchTerm.trim()) {
+        const term = searchTerm.toLowerCase();
+        const terms = getSearchTerms(icon.name);
+        return (
+          terms.some((t) => t.includes(term)) ||
+          icon.name.toLowerCase().includes(term)
+        );
+      }
+      return true;
+    });
+  }, [animatedIcons, selectedCategory, searchTerm]);
+
+  const filteredIcons =
+    iconType === "static" ? filteredStaticIcons : filteredAnimatedIcons;
 
   const displayedIcons = useMemo(() => {
     return filteredIcons.slice(0, displayCount);
@@ -87,7 +113,7 @@ export default function Home() {
   // Reset display
   useMemo(() => {
     setDisplayCount(50);
-  }, [selectedMode, selectedCategory, selectedStyle, searchTerm]);
+  }, [selectedMode, selectedCategory, selectedStyle, searchTerm, iconType]);
 
   const loadMore = () => {
     setDisplayCount((prev) => Math.min(prev + 50, filteredIcons.length));
@@ -117,9 +143,19 @@ export default function Home() {
     setSvgContent(text);
   };
 
+  const openAnimatedPreview = async (icon: AnimatedIconMeta) => {
+    setPreviewAnimatedIcon(icon);
+    setIsAnimatedModalOpen(true);
+  };
+
   const closePreview = () => {
     setIsModalOpen(false);
     setTimeout(() => setPreviewIcon(null), 200);
+  };
+
+  const closeAnimatedPreview = () => {
+    setIsAnimatedModalOpen(false);
+    setTimeout(() => setPreviewAnimatedIcon(null), 200);
   };
 
   const handleCopyCode = () => {
@@ -151,10 +187,13 @@ export default function Home() {
     label: st === "all" ? "All Styles" : st,
   }));
 
+  const totalIcons =
+    iconType === "static" ? icons.length : animatedIcons.length;
+
   return (
     <main className="min-h-screen bg-zinc-900 text-zinc-100 selection:bg-zinc-700">
       <div className="container mx-auto px-4 py-10">
-        <Header count={icons.length} />
+        <Header count={totalIcons} />
         <FilterBar
           modeOptions={MODE_OPTIONS}
           categoryOptions={categoryOptions}
@@ -169,6 +208,8 @@ export default function Home() {
           onSearchChange={setSearchTerm}
           hasActiveFilters={hasActiveFilters}
           onClearFilters={clearAllFilters}
+          iconType={iconType}
+          onIconTypeChange={setIconType}
         />
         <SelectionActions
           selectedCount={selectedIcons.size}
@@ -188,14 +229,25 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <IconGrid
-              ref={gridRef}
-              icons={displayedIcons}
-              selectedIcons={selectedIcons}
-              onIconClick={handleIconClick}
-              onToggleSelection={toggleSelection}
-              onPreview={openPreview}
-            />
+            {iconType === "static" ? (
+              <IconGrid
+                ref={gridRef}
+                icons={displayedIcons as IconMeta[]}
+                selectedIcons={selectedIcons}
+                onIconClick={handleIconClick}
+                onToggleSelection={toggleSelection}
+                onPreview={openPreview}
+              />
+            ) : (
+              <AnimatedIconGrid
+                ref={gridRef}
+                icons={displayedIcons as AnimatedIconMeta[]}
+                selectedIcons={selectedIcons}
+                onIconClick={handleIconClick}
+                onToggleSelection={toggleSelection}
+                onPreview={openAnimatedPreview}
+              />
+            )}
             {displayCount < filteredIcons.length && (
               <div className="flex justify-center mt-12">
                 <button
@@ -210,6 +262,7 @@ export default function Home() {
         )}
       </div>
 
+      {/* Static icon preview modal */}
       <PreviewModal
         icon={previewIcon}
         isOpen={isModalOpen}
@@ -217,7 +270,17 @@ export default function Home() {
         onClose={closePreview}
         onCopy={handleCopyCode}
         allIcons={icons}
-        navIcons={filteredIcons}
+        navIcons={filteredStaticIcons}
+      />
+
+      {/* Animated icon preview modal */}
+      <AnimatedPreviewModal
+        icon={previewAnimatedIcon}
+        isOpen={isAnimatedModalOpen}
+        jsonContent={jsonContent}
+        onClose={closeAnimatedPreview}
+        onCopy={handleCopyCode}
+        navIcons={filteredAnimatedIcons}
       />
 
       <Toast visible={toastVisible} message={toastMessage} />

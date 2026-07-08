@@ -27,7 +27,7 @@ export function CustomSelect({ options, value, onChange }: CustomSelectProps) {
 
         <ListboxOptions
           transition
-          className="list-box-options absolute z-10 mt-2 w-full bg-zinc-900 ring ring-white/10 rounded-xl py-1 shadow-lg focus:outline-none max-h-60 overflow-auto origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0"
+          className="list-box-options scrollbar-none absolute z-10 mt-2 w-full bg-zinc-900 ring ring-white/10 rounded-xl py-1 shadow-lg focus:outline-none max-h-60 overflow-auto origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0"
         >
           {options.map((option) => (
             <ListboxOption

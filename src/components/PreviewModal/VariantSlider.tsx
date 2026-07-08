@@ -8,6 +8,11 @@ interface VariantSidebarProps {
   allIcons: IconMeta[];
   onModeChange: (mode: Mode) => void;
   onStyleChange: (style: Style) => void;
+  prevIcon: IconMeta | null;
+  nextIcon: IconMeta | null;
+  navIndex: number;
+  navCount: number;
+  onNavigate: (icon: IconMeta) => void;
 }
 
 function getVariantPath(
@@ -57,11 +62,16 @@ export function VariantSidebar({
   allIcons,
   onModeChange,
   onStyleChange,
+  prevIcon,
+  nextIcon,
+  navIndex,
+  navCount,
+  onNavigate,
 }: VariantSidebarProps) {
   return (
-    <div className="flex flex-col items-center gap-6 pr-5 w-[10%]">
+    <div className="flex flex-col items-start lg:items-center gap-4 sm:gap-6 sm:pr-5 sm:w-[10%] w-full mb-4 sm:mb-0">
       {/* Mode picker */}
-      <div className="flex flex-col gap-y-2">
+      <div className="flex sm:flex-col gap-2 sm:w-fit w-full">
         {MODES.map((mode) => {
           const available = isModeAvailable(icon, allIcons, mode);
           const isSelected = selectedMode === mode;
@@ -71,7 +81,7 @@ export function VariantSidebar({
               onClick={() => available && onModeChange(mode)}
               disabled={!available}
               title={!available ? "Not available" : undefined}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 capitalize
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150 capitalize
                 ${
                   isSelected && available
                     ? "bg-teal-500/20 text-teal-300 ring-1 ring-teal-500/50"
@@ -84,10 +94,52 @@ export function VariantSidebar({
             </button>
           );
         })}
+        {/* Mobile icon nav */}
+        <button
+          onClick={() => prevIcon && onNavigate(prevIcon)}
+          disabled={!prevIcon}
+          className="ml-auto sm:hidden p-2 rounded-xl bg-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+        {/* <span className="sm:hidden text-[10px] text-zinc-500 flex items-center">
+          {navIndex + 1}/{navCount}
+        </span> */}
+        <button
+          onClick={() => nextIcon && onNavigate(nextIcon)}
+          disabled={!nextIcon}
+          className="sm:hidden p-2 rounded-xl bg-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
       </div>
 
       {/* Style picker with mini previews */}
-      <div className="flex flex-col gap-y-4">
+      <div className="flex sm:flex-col gap-3 sm:gap-y-4">
         {STYLES.map((style) => {
           const available = isStyleAvailable(
             icon,
@@ -105,7 +157,7 @@ export function VariantSidebar({
               onClick={() => available && onStyleChange(style)}
               disabled={!available}
               title={available ? style : "Not available"}
-              className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-150
+              className={`flex justify-center items-center rounded-lg sm:rounded-xl border size-10 sm:size-14 transition-all duration-150
                 ${
                   isSelected && available
                     ? "border-teal-400 bg-teal-500/10 ring-1 ring-teal-500/30 cursor-pointer"
@@ -118,15 +170,15 @@ export function VariantSidebar({
                 <img
                   src={variantPath}
                   alt={`${style} style`}
-                  className="size-6 object-contain"
+                  className="size-5 sm:size-6 object-contain"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.opacity = "0.2";
                   }}
                 />
               ) : (
-                <span className="size-6 flex items-center justify-center text-zinc-600">
+                <span className="size-5 sm:size-6 flex items-center justify-center text-zinc-600">
                   <svg
-                    className="size-4"
+                    className="size-3 sm:size-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

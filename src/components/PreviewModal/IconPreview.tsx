@@ -4,7 +4,7 @@ import { IconMeta } from "../../types";
 function SvgBg() {
   const Icon = svgbgIcon;
   return (
-    <span className="svg-bg size-53.5" aria-label="svgbg">
+    <span className="svg-bg size-24 sm:size-53.5" aria-label="svgbg">
       <Icon />
     </span>
   );
@@ -34,7 +34,7 @@ export function IconPreview({
         <img
           src={activeIconPath ? activeIconPath : undefined}
           alt={icon.name}
-          className="lg:w-38 w-30 absolute"
+          className="sm:w-38 w-18 absolute"
         />
       ) : (
         <div className="lg:w-38 w-30 aspect-square flex items-center justify-center text-zinc-600 text-xs absolute">
