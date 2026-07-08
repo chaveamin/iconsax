@@ -1,8 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 /public/icons
-/public/icons-metadata.json
 /public/icons-animated
+/public/icons-metadata.json
+/public/icons-animated-metadata.json
 .mimocode
 
 # dependencies
