@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
+import { ServiceWorkerRegistration } from "@/src/components/pwa";
 
 const jetBrains = localFont({
   src: "../../public/JetBrains.ttf",
@@ -19,7 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html className={`${jetBrains.variable} h-full antialiased font-jet`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ServiceWorkerRegistration />
+        {children}
+      </body>
     </html>
   );
 }
